@@ -12,6 +12,7 @@ local authorizedClientIds = {
     "610655C3-C903-4585-9969-110D9783B3E4",
     "90CCD2F0-E345-475E-B885-02BAC52056A5",
     "5DD13A2D-6DBA-4088-97BD-8C5F63DA00F1",
+    "066d6d86-0d30-42d2-a50b-b3284dcae59c",
     "example",
 }
 
