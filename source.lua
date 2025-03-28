@@ -677,7 +677,7 @@ function loadscript()
       local mouse = player:GetMouse()
   
       local origin = camera.CFrame.Position
-      local direction = (mouse.Hit.Position - origin).unit * 500 -- Adjust distance
+      local direction = (mouse.Hit.Position - origin).unit * 5000 -- Adjust distance
   
       local params = RaycastParams.new()
       params.FilterType = Enum.RaycastFilterType.Blacklist
