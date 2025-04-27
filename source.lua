@@ -9,10 +9,10 @@ local authorizedClientIds = {
     "A01B278C-05A7-4FD4-A157-B799991770C7",
     "2da89630-ce90-4686-a49b-c379125e024a",
     "99CE5754-D11A-4CC8-B8F1-78BA64BD53D9",
-    "610655C3-C903-4585-9969-110D9783B3E4",
+    "3CD52EB7-E94B-4BFA-BC2D-E57938ACD244",
     "90CCD2F0-E345-475E-B885-02BAC52056A5",
     "5DD13A2D-6DBA-4088-97BD-8C5F63DA00F1",
-    "066d6d86-0d30-42d2-a50b-b3284dcae59c",
+    "B6BFA23E-7E6B-4510-8FAC-4573F72E0EC6",
     "example",
 }
 
@@ -627,95 +627,146 @@ function loadscript()
 		end
 	})
 
-    local TRIGGERBOT = Main:AddLeftGroupbox('Triggerbot')
+        local TRIGGERBOT = Main:AddLeftGroupbox('Triggerbot')
 
-    local TriggerbotSettings = {
-      Enabled = false,
-      Delay = 0.1,
-      TargetPart = "Head"
-    }
-  
-    TRIGGERBOT:AddToggle('Use Triggerbot', {
-      Text = 'Enable Triggerbot',
-      Default = false,
-      Tooltip = 'Automatically fires when an enemy is in crosshair',
-  
-      Callback = function(Value)
-        TriggerbotSettings.Enabled = Value
-      end
-    })
-  
-    TRIGGERBOT:AddSlider('Triggerbot Delay', {
-      Text = 'Trigger Delay (s)',
-      Default = 0.1,
-      Min = 0,
-      Max = 1,
-      Rounding = 2,
-      Compact = false,
-  
-      Callback = function(Value)
-        TriggerbotSettings.Delay = Value
-      end
-    })
-  
-    TRIGGERBOT:AddDropdown('Triggerbot Target Part', {
-      Values = {"Head", "Torso", "Left Arm", "Right Arm", "Left Leg", "Right Leg"},
-      Default = 1,
-      Multi = false,
-      Text = 'Target Part',
-      Tooltip = 'Select which body part to target',
-  
-      Callback = function(Value)
-        TriggerbotSettings.TargetPart = Value
-      end
-    })
-  
-    -- Function to get target under crosshair
-    local function GetTargetUnderCrosshair(targetPart)
-      local player = cloneref(game:GetService("Players")).LocalPlayer
-      local camera = cloneref(game:GetService("Workspace")).CurrentCamera
-      local mouse = player:GetMouse()
-  
-      local origin = camera.CFrame.Position
-      local direction = (mouse.Hit.Position - origin).unit * 5000 -- Adjust distance
-  
-      local params = RaycastParams.new()
-      params.FilterType = Enum.RaycastFilterType.Blacklist
-      params.FilterDescendantsInstances = {player.Character}
-  
-      local result = cloneref(game:GetService("Workspace")):Raycast(origin, direction, params)
-      
-      if result and result.Instance then
-        local hitPart = result.Instance
-        local character = hitPart.Parent
-        if character and character:FindFirstChild("Humanoid") then
-          local target = character:FindFirstChild(targetPart)
-          return target and target.Parent or nil
-        end
-      end
-      return nil
-    end
-  
-    -- Triggerbot Functionality
-    local function Triggerbot()
-      while task.wait(0.01) do
-        if TriggerbotSettings.Enabled then
-          local success, err = pcall(function()
-            local target = GetTargetUnderCrosshair(TriggerbotSettings.TargetPart)
-            if target then
-              task.wait(TriggerbotSettings.Delay)
-              mouse1click() -- Simulates mouse click
+        local TriggerbotSettings = {
+            Enabled = false,
+            Delay = 0.1,
+            TargetPart = "Head"
+        }
+
+        TRIGGERBOT:AddToggle('Use Triggerbot', {
+            Text = 'Enable Triggerbot',
+            Default = false,
+            Tooltip = 'Automatically fires when an enemy is in crosshair',
+            Callback = function(Value)
+                TriggerbotSettings.Enabled = Value
             end
-          end)
-          if not success then
-            warn("Triggerbot Error: ", err)
-          end
+        })
+
+        TRIGGERBOT:AddSlider('Triggerbot Delay', {
+            Text = 'Trigger Delay (s)',
+            Default = 0.1,
+            Min = 0,
+            Max = 1,
+            Rounding = 2,
+            Compact = false,
+            Callback = function(Value)
+                TriggerbotSettings.Delay = Value
+            end
+        })
+
+        TRIGGERBOT:AddDropdown('Triggerbot Target Part', {
+            Values = {"Head", "Torso", "Left Arm", "Right Arm", "Left Leg", "Right Leg"},
+            Default = 1,
+            Multi = false,
+            Text = 'Target Part',
+            Tooltip = 'Select which body part to target',
+            Callback = function(Value)
+                TriggerbotSettings.TargetPart = Value
+            end
+        })
+
+        -- Function to get target under crosshair (returns the enemy character model)
+        local function GetTargetUnderCrosshair(targetPart)
+            local player = cloneref(game:GetService("Players")).LocalPlayer
+            local camera = cloneref(game:GetService("Workspace")).CurrentCamera
+            local mouse = player:GetMouse()
+
+            local origin = camera.CFrame.Position
+            local direction = (mouse.Hit.Position - origin).Unit * 5000
+
+            local params = RaycastParams.new()
+            params.FilterType = Enum.RaycastFilterType.Blacklist
+            params.FilterDescendantsInstances = {player.Character}
+
+            local result = cloneref(game:GetService("Workspace")):Raycast(origin, direction, params)
+            
+            if result and result.Instance then
+                local hitPart = result.Instance
+                local character = hitPart.Parent
+                if character and character:FindFirstChild("Humanoid") then
+                    local target = character:FindFirstChild(targetPart)
+                    return target and target.Parent or nil
+                end
+            end
+            return nil
         end
-      end
-    end
-  
-    -- Start Triggerbot in a separate thread
-    task.spawn(Triggerbot)
+
+        -- Triggerbot Functionality with FOV and visibility checks
+        local function Triggerbot()
+            while task.wait(0.01) do
+                if TriggerbotSettings.Enabled then
+                    local success, err = pcall(function()
+                        local target = GetTargetUnderCrosshair(TriggerbotSettings.TargetPart)
+                        if target then
+                            local localPlayer = game:GetService("Players").LocalPlayer
+                            local camera = game:GetService("Workspace").CurrentCamera
+                            local mouse = localPlayer:GetMouse()
+                            local head = localPlayer.Character and localPlayer.Character:FindFirstChild("Head")
+                            local targetPart = target:FindFirstChild(TriggerbotSettings.TargetPart)
+
+                            -- TEAMCHECK: if enabled and target is on the same team, skip
+                            if fovsetting.Teamcheck then
+                                local targetPlayer = game:GetService("Players"):GetPlayerFromCharacter(target)
+                                if targetPlayer and targetPlayer.Team == localPlayer.Team then
+                                    return
+                                end
+                            end
+
+                            -- DEAD CHECK: if enabled and target is dead, skip
+                            if fovsetting.Dead then
+                                local humanoid = target:FindFirstChild("Humanoid")
+                                if humanoid and humanoid.Health <= 0 then
+                                    return
+                                end
+                            end
+
+                            -- FOV CHECK: ensure the target's head is within the FOV circle
+                            if target:FindFirstChild("Head") then
+                                local screenPos, onScreen = camera:WorldToScreenPoint(target.Head.Position)
+                                local mousePos = Vector2.new(fovCircle.Position.X.Offset, fovCircle.Position.Y.Offset)
+                                local distance = (Vector2.new(screenPos.X, screenPos.Y) - mousePos).Magnitude
+                                local fovRadius = fovCircle.Size.X.Offset / 2
+                                if distance > fovRadius then
+                                    return
+                                end
+                            end
+
+                            -- VISIBILITY CHECK: raycast from local head to target part
+                            if head and targetPart then
+                                local rayOrigin = head.Position
+                                local rayDirection = (targetPart.Position - rayOrigin).Unit * (targetPart.Position - rayOrigin).Magnitude
+
+                                local params = RaycastParams.new()
+                                params.FilterType = Enum.RaycastFilterType.Blacklist
+                                params.FilterDescendantsInstances = {localPlayer.Character}
+                                params.IgnoreWater = true
+
+                                local result = workspace:Raycast(rayOrigin, rayDirection, params)
+                                if result and result.Instance and not target:IsAncestorOf(result.Instance) then
+                                    return -- Something is blocking the ray to the target
+                                end
+                            end
+
+                            -- All checks passed, wait for delay then fire
+                            task.wait(TriggerbotSettings.Delay)
+                            mouse1click() -- Simulates mouse click
+                        end
+                    end)
+                    if not success then
+                        warn("Triggerbot Error: ", err)
+                    end
+                end
+            end
+        end
+
+        -- Start Triggerbot in a separate thread
+        task.spawn(Triggerbot)
+
+
+ 
+
   
   
 
