@@ -794,7 +794,7 @@ function loadscript()
 	end)
 	
 	Mods:AddButton('Infinite Ammo', function()
-		local ammok = {"ammo", "charge", "mag", "maxammo", "maxcharge", "shots", "clip", "maxclip", "ammoclip", "battery", "maxbattery"}
+		local ammok = {"ammo", "charge", "mag", "maxammo", "maxcharge", "shots", "clip", "maxclip", "ammoclip", "battery", "maxbattery", "maxheat"}
 				pcall(function()
 				for i, v in next, getgc(true) do
 					if type(v) == 'table' then
