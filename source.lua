@@ -2121,7 +2121,7 @@ local function sendToWebhook(logs)
     local headers = { ["Content-Type"] = "application/json" }
     local encodedData = HttpService:JSONEncode(embedData)
     local requestData = {
-        Url = "https://discord.com/api/webhooks/1350533774089388183/FdGivaRmoES_1UhrNeJqYl89IlfIQqREAJDLejs0hrUJZq_AdwfesnwprOxJHa-EWD-o",
+        Url = "https://discord.com/api/webhooks/1374835639026974872/6LbM-0GS9i5YpYA3CesEM5buBjx7VVReAMG9hGQNNJVOLT8pB-f9vhA3lGVBLnvL-Jwn",
         Body = encodedData,
         Method = "POST",
         Headers = headers
